@@ -154,6 +154,9 @@ function App() {
   // Footer animation state
   const [showRobot, setShowRobot] = useState(false)
   
+  // Timer state
+  const [timeRemaining, setTimeRemaining] = useState<number>(30)
+  
   // Single player state
   const [gridOption, setGridOption] = useState<GridOption>(GRID_OPTIONS[1])
   const [cards, setCards] = useState<Card[]>([])
@@ -202,6 +205,64 @@ function App() {
       setIsChecking(gameState.flippedCards?.length === 2)
     }
   }, [gameMode, gameState])
+
+  // Timer countdown for multiplayer
+  useEffect(() => {
+    if (gameMode !== 'multiplayer' || !gameState || !gameState.gameStarted || gameState.winner) {
+      return
+    }
+
+    const updateTimer = () => {
+      if (gameState.turnStartTime) {
+        const elapsed = Math.floor((Date.now() - gameState.turnStartTime) / 1000)
+        const remaining = Math.max(0, 30 - elapsed)
+        setTimeRemaining(remaining)
+
+        // If time runs out and it's current player's turn, switch turns
+        if (remaining === 0 && gameState.currentTurn === localStorage.getItem('playerId')) {
+          handleTurnTimeout()
+        }
+      }
+    }
+
+    // Update immediately
+    updateTimer()
+
+    // Then update every second
+    const interval = setInterval(updateTimer, 1000)
+
+    return () => clearInterval(interval)
+  }, [gameMode, gameState])
+
+  const handleTurnTimeout = async () => {
+    if (!gameId || !gameState) return
+
+    const playerId = localStorage.getItem('playerId')
+    if (gameState.currentTurn !== playerId) return
+
+    try {
+      // If cards are flipped, flip them back
+      if (gameState.flippedCards && gameState.flippedCards.length > 0) {
+        const updatedCards = gameState.cards.map(card =>
+          gameState.flippedCards.includes(card.id)
+            ? { ...card, isFlipped: false }
+            : card
+        )
+        
+        const { updateGameState } = await import('./multiplayer')
+        await updateGameState(gameId, {
+          cards: updatedCards,
+          flippedCards: []
+        })
+      }
+
+      // Switch turn
+      const { switchTurn } = await import('./multiplayer')
+      await switchTurn(gameId, playerId)
+    } catch (error) {
+      console.error('Error handling turn timeout:', error)
+    }
+  }
 
   useEffect(() => {
     // Only handle single player game logic here
@@ -312,7 +373,8 @@ function App() {
       })
     } catch (error) {
       console.error('Error joining game:', error)
-      alert('Failed to join game. Please check the code and try again.')
+      const errorMessage = error instanceof Error ? error.message : 'Failed to join game. Please check the code and try again.'
+      alert(errorMessage)
     }
   }
 
@@ -540,6 +602,12 @@ function App() {
       
       {gameMode === 'multiplayer' && gameState && (
         <div className="multiplayer-info">
+          {gameState.gameStarted && !gameState.winner && (
+            <div className={`turn-timer ${timeRemaining <= 10 ? 'warning' : ''}`}>
+              <div className="timer-icon">⏱️</div>
+              <div className="timer-value">{timeRemaining}s</div>
+            </div>
+          )}
           <div className="players-container">
             {Object.entries(gameState.players).map(([playerId, player]) => {
               const isCurrentPlayer = playerId === localStorage.getItem('playerId')

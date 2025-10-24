@@ -16,6 +16,9 @@ export interface GameState {
   flippedCards: number[]
   gameStarted: boolean
   winner: string | null
+  turnTimer?: number // Remaining seconds for current turn
+  turnStartTime?: number // Timestamp when turn started
+  maxPlayers: number // Maximum number of players allowed
 }
 
 export const createGame = async (playerName: string): Promise<string> => {
@@ -37,7 +40,9 @@ export const createGame = async (playerName: string): Promise<string> => {
     currentTurn: playerId,
     flippedCards: [],
     gameStarted: false,
-    winner: null
+    winner: null,
+    maxPlayers: 2,
+    turnTimer: 30
   }
   
   await set(newGameRef, initialState)
@@ -51,6 +56,23 @@ export const createGame = async (playerName: string): Promise<string> => {
 export const joinGame = async (gameId: string, playerName: string): Promise<string> => {
   const playerId = `player_${Date.now()}`
   const gameRef = ref(database, `games/${gameId}`)
+  
+  // Check if game exists and can be joined
+  const snapshot = await get(gameRef)
+  const gameState = snapshot.val() as GameState | null
+  
+  if (!gameState) {
+    throw new Error('Game not found')
+  }
+  
+  if (gameState.gameStarted) {
+    throw new Error('Game has already started')
+  }
+  
+  const playerCount = Object.keys(gameState.players || {}).length
+  if (playerCount >= gameState.maxPlayers) {
+    throw new Error('Game is full')
+  }
   
   await update(gameRef, {
     [`players/${playerId}`]: {
@@ -71,13 +93,33 @@ export const startGame = async (gameId: string, cards: Card[]) => {
   
   await update(gameRef, {
     cards,
-    gameStarted: true
+    gameStarted: true,
+    turnTimer: 30,
+    turnStartTime: Date.now()
   })
 }
 
 export const updateGameState = async (gameId: string, updates: Partial<GameState>) => {
   const gameRef = ref(database, `games/${gameId}`)
   await update(gameRef, updates)
+}
+
+export const switchTurn = async (gameId: string, currentPlayerId: string) => {
+  const gameRef = ref(database, `games/${gameId}`)
+  const snapshot = await get(gameRef)
+  const currentState = snapshot.val() as GameState
+  
+  // Get other player's ID
+  const otherPlayerId = Object.keys(currentState.players).find(id => id !== currentPlayerId)
+  
+  if (otherPlayerId) {
+    await update(gameRef, {
+      currentTurn: otherPlayerId,
+      turnTimer: 30,
+      turnStartTime: Date.now(),
+      flippedCards: []
+    })
+  }
 }
 
 export const flipCard = async (gameId: string, cardId: number) => {
@@ -165,7 +207,9 @@ export const flipCard = async (gameId: string, cardId: number) => {
         await update(gameRef, {
           cards: finalCards,
           flippedCards: [],
-          currentTurn: otherPlayerId || playerId
+          currentTurn: otherPlayerId || playerId,
+          turnTimer: 30,
+          turnStartTime: Date.now()
         })
       }
     }, 1000)

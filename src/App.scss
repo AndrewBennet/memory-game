@@ -682,6 +682,70 @@ footer {
   margin-bottom: 1.5rem;
 }
 
+.turn-timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  border: 2px solid rgba(102, 126, 234, 0.4);
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+  transition: all 0.3s;
+  
+  &.warning {
+    border-color: #f5576c;
+    background: rgba(245, 87, 108, 0.15);
+    animation: timerPulse 1s ease-in-out infinite;
+    
+    .timer-value {
+      color: #f5576c;
+    }
+  }
+}
+
+.timer-icon {
+  font-size: 1.8rem;
+  animation: tickTock 1s ease-in-out infinite;
+}
+
+.timer-value {
+  font-family: 'Courier New', monospace;
+  font-size: 2rem;
+  min-width: 3.5rem;
+  text-align: center;
+  color: #667eea;
+  text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+}
+
+@keyframes timerPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 16px rgba(245, 87, 108, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 6px 24px rgba(245, 87, 108, 0.6);
+  }
+}
+
+@keyframes tickTock {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
 .players-container {
   display: flex;
   gap: 2rem;

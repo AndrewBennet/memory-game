@@ -7,10 +7,12 @@
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(10px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   z-index: 1000;
   animation: fadeIn 0.3s ease;
+  overflow-y: auto;
+  padding: 2rem 0;
 }
 
 @keyframes fadeIn {
@@ -36,8 +38,8 @@
   max-width: 90vw;
   color: white;
   position: relative;
-  overflow: hidden;
   animation: slideUp 0.3s ease;
+  margin: auto 0;
 
   &::before {
     content: '';
