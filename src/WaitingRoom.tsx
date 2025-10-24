@@ -12,6 +12,7 @@ interface WaitingRoomProps {
 
 function WaitingRoom({ gameCode, playerName, isHost, opponentName, onStartGame, onLeave }: WaitingRoomProps) {
   const [copied, setCopied] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
 
   const handleCopy = async () => {
     try {
@@ -23,25 +24,52 @@ function WaitingRoom({ gameCode, playerName, isHost, opponentName, onStartGame, 
     }
   }
 
+  const handleCopyLink = async () => {
+    try {
+      const gameUrl = `${window.location.origin}${window.location.pathname}?game=${gameCode}`
+      await navigator.clipboard.writeText(gameUrl)
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy link:', err)
+    }
+  }
+
   return (
     <div className="waiting-room">
       <div className="waiting-card">
         <h2>Game Room</h2>
         
-        <div className="game-code-display">
-          <label>Game Code:</label>
-          <div className="game-code-container">
-            <div className="game-code">{gameCode}</div>
-            <button 
-              className="copy-btn" 
-              onClick={handleCopy}
-              title="Copy to clipboard"
-            >
-              {copied ? '✓' : '📋'}
-            </button>
+        {isHost && (
+          <div className="game-code-display">
+          <label>Share Game:</label>
+          <div className="share-options">
+            <div className="share-option">
+              <label className="share-label">Code:</label>
+              <div className="game-code-container">
+                <div className="game-code">{gameCode}</div>
+                <button 
+                  className="copy-btn" 
+                  onClick={handleCopy}
+                  title="Copy code"
+                >
+                  {copied ? '✓' : '📋'}
+                </button>
+              </div>
+            </div>
+            <div className="share-divider">or</div>
+            <div className="share-option">
+              <button 
+                className="share-link-btn" 
+                onClick={handleCopyLink}
+              >
+                {linkCopied ? '✓ Link Copied!' : '� Copy Share Link'}
+              </button>
+            </div>
           </div>
-          <p className="code-hint">Share this code with your friend!</p>
-        </div>
+          <p className="code-hint">Share with your friend to join!</p>
+          </div>
+        )}
 
         <div className="players-list">
           <div className="player-item">

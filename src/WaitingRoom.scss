@@ -96,10 +96,10 @@
   text-align: center;
   backdrop-filter: blur(10px);
 
-  label {
+  > label {
     display: block;
     font-size: 0.875rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
     color: #e0e0e0;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -107,11 +107,62 @@
   }
 }
 
+.share-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.share-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .share-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+  }
+}
+
+.share-divider {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0.25rem 0;
+}
+
 .game-code-container {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   justify-content: center;
+}
+
+.share-link-btn {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 2px solid rgba(102, 126, 234, 0.4);
+  border-radius: 10px;
+  background: rgba(102, 126, 234, 0.2);
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+
+  &:hover {
+    background: rgba(102, 126, 234, 0.35);
+    border-color: rgba(102, 126, 234, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
 .game-code {

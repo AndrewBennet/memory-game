@@ -148,6 +148,11 @@ function App() {
   const [playerName, setPlayerName] = useState<string>('')
   const [isHost, setIsHost] = useState(false)
   const [gameState, setGameState] = useState<GameState | null>(null)
+  const [pendingGameId, setPendingGameId] = useState<string | null>(null)
+  const [showNamePrompt, setShowNamePrompt] = useState(false)
+  
+  // Footer animation state
+  const [showRobot, setShowRobot] = useState(false)
   
   // Single player state
   const [gridOption, setGridOption] = useState<GridOption>(GRID_OPTIONS[1])
@@ -159,6 +164,25 @@ function App() {
   const [isShuffling, setIsShuffling] = useState(false)
 
   const numCards = gridOption.rows * gridOption.cols
+
+  // Check for URL parameter on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const gameIdFromUrl = params.get('game')
+    
+    if (gameIdFromUrl) {
+      setPendingGameId(gameIdFromUrl)
+      setShowNamePrompt(true)
+      setGameMode('multiplayer')
+    }
+
+    // Trigger robot animation after 3 seconds
+    const robotTimer = setTimeout(() => {
+      setShowRobot(true)
+    }, 1200)
+
+    return () => clearTimeout(robotTimer)
+  }, [])
 
   useEffect(() => {
     // Only create cards in single player mode
@@ -341,6 +365,17 @@ function App() {
   const totalPairs = numCards / 2
   const isGameComplete = matchedPairs === totalPairs
 
+  // Handle joining game from URL with name
+  const handleJoinFromUrl = async (name: string) => {
+    if (pendingGameId) {
+      await handleJoinGame(pendingGameId, name)
+      setPendingGameId(null)
+      setShowNamePrompt(false)
+      // Clear URL parameter
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }
+
   // Menu screen
   if (gameMode === 'menu') {
     return (
@@ -368,9 +403,61 @@ function App() {
           </button>
         </div>
         <footer>
-          By Andrew Bennet
+          <span className="footer-text">By Andrew Bennet</span>
+          <div className={`robot-sticker ${showRobot ? 'show' : ''}`}>
+            <span className="robot-emoji">🤖</span>
+            <span className="sticker-text">with help from Copilot</span>
+          </div>
         </footer>
       </div>
+    )
+  }
+
+  // Name prompt for joining via URL
+  if (showNamePrompt && pendingGameId) {
+    return (
+      <>
+        <div className="app">
+          <img src="/icon.svg" alt="Logo" className="app-logo" />
+          <h1>PromptMatch</h1>
+        </div>
+        <div className="multiplayer-lobby">
+          <div className="lobby-card">
+            <h2>Join Game</h2>
+            <p className="lobby-description">Enter your name to join the game</p>
+            <input
+              type="text"
+              placeholder="Your name"
+              value={playerName}
+              onChange={(e) => setPlayerName(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && playerName.trim() && handleJoinFromUrl(playerName.trim())}
+              className="lobby-input"
+              maxLength={20}
+              autoFocus
+            />
+            <div className="lobby-buttons">
+              <button 
+                className="lobby-btn join-btn" 
+                onClick={() => handleJoinFromUrl(playerName.trim())}
+                disabled={!playerName.trim()}
+              >
+                Join Game
+              </button>
+              <button 
+                className="lobby-btn cancel-btn" 
+                onClick={() => {
+                  setShowNamePrompt(false)
+                  setPendingGameId(null)
+                  setGameMode('menu')
+                  window.history.replaceState({}, '', window.location.pathname)
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
     )
   }
 
@@ -539,7 +626,11 @@ function App() {
         })}
       </div>
       <footer>
-        By Andrew Bennet
+        <span className="footer-text">By Andrew Bennet</span>
+        <div className={`robot-sticker ${showRobot ? 'show' : ''}`}>
+          <span className="robot-emoji">🤖</span>
+          <span className="sticker-text">with help from Copilot</span>
+        </div>
       </footer>
     </div>
   )
