@@ -6,6 +6,8 @@ interface Card {
   value: number
   isFlipped: boolean
   isMatched: boolean
+  type?: 'text' | 'image'
+  content?: string
 }
 
 // Shuffle array using Fisher-Yates algorithm
@@ -18,25 +20,72 @@ const shuffleArray = <T,>(array: T[]): T[] => {
   return shuffled
 }
 
-// Create initial cards with pairs of numbers
+// Import AI images
+import astronautBakingCake from './assets/ai_images/astronaut-baking-cake.png'
+import bookAsBoat from './assets/ai_images/book-as-boat.png'
+import catRidingSkateboard from './assets/ai_images/cat-riding-skateboard.png'
+import coffeeCupSpaceship from './assets/ai_images/coffee-cup-spaceship.png'
+import desertIceCreamTruck from './assets/ai_images/desert-ice-cream-truck.png'
+import dragonDrinkingTea from './assets/ai_images/dragon-drinking-tea.png'
+import floatingIslandCity from './assets/ai_images/floating-island-city.png'
+import pizzaSliceUmbrella from './assets/ai_images/pizza-slice-umbrella.png'
+import robotReadingBook from './assets/ai_images/robot-reading-book.png'
+import treehouseInSpace from './assets/ai_images/treehouse-in-space.png'
+import underwaterBicycle from './assets/ai_images/underwater-bicycle.png'
+
+// AI image prompts for the game
+const AI_PROMPTS = [
+  { prompt: "Astronaut baking a cake", image: astronautBakingCake },
+  { prompt: "Book as a boat", image: bookAsBoat },
+  { prompt: "Cat riding a skateboard", image: catRidingSkateboard },
+  { prompt: "Coffee cup spaceship", image: coffeeCupSpaceship },
+  { prompt: "Desert ice cream truck", image: desertIceCreamTruck },
+  { prompt: "Dragon drinking tea", image: dragonDrinkingTea },
+  { prompt: "Floating island city", image: floatingIslandCity },
+  { prompt: "Pizza slice umbrella", image: pizzaSliceUmbrella },
+  { prompt: "Robot reading a book", image: robotReadingBook },
+  { prompt: "Treehouse in space", image: treehouseInSpace },
+  { prompt: "Underwater bicycle", image: underwaterBicycle },
+]
+
+// Create initial cards with prompt-image pairs
 const createCards = (numCards: number = 16): Card[] => {
   const numPairs = Math.floor(numCards / 2)
   const hasOddCard = numCards % 2 === 1
-  const numbers = Array.from({ length: numPairs }, (_, i) => i + 1)
   
-  // Create pairs of each number
-  const cards = numbers.flatMap((num, index) => [
-    { id: index * 2, value: num, isFlipped: false, isMatched: false },
-    { id: index * 2 + 1, value: num, isFlipped: false, isMatched: false }
+  // Randomly select prompts from available prompts
+  const shuffledPrompts = shuffleArray([...AI_PROMPTS])
+  const selectedPrompts = shuffledPrompts.slice(0, numPairs)
+  
+  // Create prompt-image pairs
+  const cards = selectedPrompts.flatMap((item, index) => [
+    { 
+      id: index * 2, 
+      value: index + 1, 
+      isFlipped: false, 
+      isMatched: false,
+      type: 'text' as const,
+      content: item.prompt
+    },
+    { 
+      id: index * 2 + 1, 
+      value: index + 1, 
+      isFlipped: false, 
+      isMatched: false,
+      type: 'image' as const,
+      content: item.image
+    }
   ])
   
-  // Add one odd card if needed
+  // Add one odd card if needed (shouldn't happen with our even grids)
   if (hasOddCard) {
     cards.push({ 
       id: cards.length, 
-      value: numbers.length + 1, 
+      value: cards.length + 1, 
       isFlipped: false, 
-      isMatched: false 
+      isMatched: false,
+      type: 'text' as const,
+      content: '?'
     })
   }
   
@@ -58,13 +107,26 @@ function CardComponent({ card, onFlip, disabled }: CardProps) {
 
   return (
     <div 
-      className={`card ${card.isFlipped ? 'flipped' : ''} ${card.isMatched ? 'matched' : ''}`}
+      className={`card ${card.isFlipped ? 'flipped' : ''} ${card.isMatched ? 'matched' : ''} ${card.type ? `card-${card.type}` : ''}`}
       onClick={handleClick}
       style={{ cursor: disabled || card.isMatched ? 'default' : 'pointer' }}
     >
       <div className="card-inner">
-        <div className="card-front"></div>
-        <div className="card-back">{card.value}</div>
+        <div className="card-front">
+          {card.type === 'text' && <div className="card-type-indicator">Prompt</div>}
+          {card.type === 'image' && <div className="card-type-indicator">Image</div>}
+        </div>
+        <div className="card-back">
+          {card.type === 'text' ? (
+            <div className="card-prompt">{card.content}</div>
+          ) : card.type === 'image' ? (
+            <div className="card-image">
+              <img src={card.content} alt="AI generated" />
+            </div>
+          ) : (
+            card.value
+          )}
+        </div>
       </div>
     </div>
   )
@@ -174,7 +236,8 @@ function App() {
 
   return (
     <div className="app">
-      <h1>Memory Card Game</h1>
+      <img src="/icon.svg" alt="Logo" className="app-logo" />
+      <h1>PromptMatch</h1>
       <div className="grid-size-selector">
         {GRID_OPTIONS.map(option => (
           <button
@@ -207,6 +270,9 @@ function App() {
           />
         ))}
       </div>
+      <footer>
+        By Andrew Bennet
+      </footer>
     </div>
   )
 }
