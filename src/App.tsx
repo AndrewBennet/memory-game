@@ -20,7 +20,8 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 // Create initial cards with pairs of numbers
 const createCards = (numCards: number = 16): Card[] => {
-  const numPairs = numCards / 2
+  const numPairs = Math.floor(numCards / 2)
+  const hasOddCard = numCards % 2 === 1
   const numbers = Array.from({ length: numPairs }, (_, i) => i + 1)
   
   // Create pairs of each number
@@ -28,6 +29,16 @@ const createCards = (numCards: number = 16): Card[] => {
     { id: index * 2, value: num, isFlipped: false, isMatched: false },
     { id: index * 2 + 1, value: num, isFlipped: false, isMatched: false }
   ])
+  
+  // Add one odd card if needed
+  if (hasOddCard) {
+    cards.push({ 
+      id: cards.length, 
+      value: numbers.length + 1, 
+      isFlipped: false, 
+      isMatched: false 
+    })
+  }
   
   return shuffleArray(cards)
 }
@@ -59,16 +70,36 @@ function CardComponent({ card, onFlip, disabled }: CardProps) {
   )
 }
 
+interface GridOption {
+  rows: number
+  cols: number
+  label: string
+}
+
+const GRID_OPTIONS: GridOption[] = [
+  { rows: 2, cols: 3, label: '2×3 (Easy)' },
+  { rows: 3, cols: 4, label: '3×4 (Medium)' },
+  { rows: 4, cols: 4, label: '4×4 (Hard)' }
+]
+
 function App() {
-  const [numCards] = useState(16)
+  const [gridOption, setGridOption] = useState<GridOption>(GRID_OPTIONS[1])
   const [cards, setCards] = useState<Card[]>([])
   const [flippedCards, setFlippedCards] = useState<number[]>([])
   const [goes, setGoes] = useState(0)
   const [matchedPairs, setMatchedPairs] = useState(0)
   const [isChecking, setIsChecking] = useState(false)
+  const [isShuffling, setIsShuffling] = useState(false)
+
+  const numCards = gridOption.rows * gridOption.cols
 
   useEffect(() => {
+    // Create cards first, then trigger shuffle animation
     setCards(createCards(numCards))
+    setIsShuffling(true)
+    setTimeout(() => {
+      setIsShuffling(false)
+    }, 600)
   }, [numCards])
 
   useEffect(() => {
@@ -116,7 +147,22 @@ function App() {
   }
 
   const handleReset = () => {
-    setCards(createCards(numCards))
+    setIsShuffling(true)
+    
+    // Wait for shuffle animation to complete before resetting
+    setTimeout(() => {
+      setCards(createCards(numCards))
+      setFlippedCards([])
+      setGoes(0)
+      setMatchedPairs(0)
+      setIsChecking(false)
+      setIsShuffling(false)
+    }, 600)
+  }
+
+  const handleGridSizeChange = (option: GridOption) => {
+    setGridOption(option)
+    setCards(createCards(option.rows * option.cols))
     setFlippedCards([])
     setGoes(0)
     setMatchedPairs(0)
@@ -129,6 +175,17 @@ function App() {
   return (
     <div className="app">
       <h1>Memory Card Game</h1>
+      <div className="grid-size-selector">
+        {GRID_OPTIONS.map(option => (
+          <button
+            key={option.label}
+            className={`size-button ${gridOption === option ? 'active' : ''}`}
+            onClick={() => handleGridSizeChange(option)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
       <div className="game-info">
         <p>Goes: {goes}</p>
         {isGameComplete && (
@@ -137,10 +194,10 @@ function App() {
           </p>
         )}
       </div>
-      <button className="reset-button" onClick={handleReset}>
-        Reset Game
+      <button className="reset-button" onClick={handleReset} disabled={isShuffling}>
+        {isShuffling ? 'Shuffling...' : 'Reset Game'}
       </button>
-      <div className="card-grid">
+      <div className={`card-grid ${isShuffling ? 'shuffling' : ''}`} style={{ gridTemplateColumns: `repeat(${gridOption.cols}, 1fr)` }}>
         {cards.map(card => (
           <CardComponent 
             key={card.id} 

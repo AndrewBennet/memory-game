@@ -15,6 +15,34 @@ h1 {
   font-size: 2.5rem;
 }
 
+.grid-size-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.size-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  background-color: #1a1a1a;
+  color: white;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.size-button:hover {
+  border-color: #646cff;
+}
+
+.size-button.active {
+  background-color: #646cff;
+  border-color: #646cff;
+}
+
 .game-info {
   margin-bottom: 1rem;
   font-size: 1.2rem;
@@ -48,22 +76,151 @@ h1 {
   transition: background-color 0.3s;
 }
 
-.reset-button:hover {
+.reset-button:hover:not(:disabled) {
   background-color: #535bf2;
+}
+
+.reset-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
-  width: 600px;
+  width: min(600px, 90vw);
   max-width: 90vw;
+  transition: transform 0.3s ease;
+}
+
+.card-grid.shuffling {
+  animation: shuffle 0.6s ease-in-out;
+}
+
+@keyframes shuffle {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(0.9) rotate(-2deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(0.95) rotate(2deg);
+    opacity: 0.5;
+  }
+  75% {
+    transform: scale(0.9) rotate(-2deg);
+    opacity: 0.7;
+  }
 }
 
 .card {
   aspect-ratio: 1;
   perspective: 1000px;
   cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.card-grid.shuffling .card {
+  animation: cardShuffle 0.6s ease-in-out;
+}
+
+.card-grid.shuffling .card:nth-child(6n+1) {
+  animation: swapPosition1 0.6s ease-in-out;
+}
+
+.card-grid.shuffling .card:nth-child(6n+2) {
+  animation: swapPosition2 0.6s ease-in-out;
+}
+
+.card-grid.shuffling .card:nth-child(6n+3) {
+  animation: swapPosition3 0.6s ease-in-out;
+}
+
+.card-grid.shuffling .card:nth-child(6n+4) {
+  animation: swapPosition4 0.6s ease-in-out;
+}
+
+.card-grid.shuffling .card:nth-child(6n+5) {
+  animation: swapPosition5 0.6s ease-in-out;
+}
+
+.card-grid.shuffling .card:nth-child(6n) {
+  animation: swapPosition6 0.6s ease-in-out;
+}
+
+/* Card moves 2 positions right, then back */
+@keyframes swapPosition1 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    z-index: 1;
+  }
+  50% {
+    transform: translate(calc(200% + 2rem), 0) rotate(360deg) scale(1.1);
+    z-index: 10;
+  }
+}
+
+/* Card moves 1 row down and 1 position left */
+@keyframes swapPosition2 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    z-index: 1;
+  }
+  50% {
+    transform: translate(calc(-100% - 1rem), calc(100% + 1rem)) rotate(-180deg) scale(1.1);
+    z-index: 10;
+  }
+}
+
+/* Card moves 1 position left */
+@keyframes swapPosition3 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    z-index: 1;
+  }
+  50% {
+    transform: translate(calc(-100% - 1rem), 0) rotate(180deg) scale(1.1);
+    z-index: 10;
+  }
+}
+
+/* Card moves 1 row up and 2 positions right */
+@keyframes swapPosition4 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    z-index: 1;
+  }
+  50% {
+    transform: translate(calc(200% + 2rem), calc(-100% - 1rem)) rotate(-360deg) scale(1.1);
+    z-index: 10;
+  }
+}
+
+/* Card moves 1 position right */
+@keyframes swapPosition5 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    z-index: 1;
+  }
+  50% {
+    transform: translate(calc(100% + 1rem), 0) rotate(-180deg) scale(1.1);
+    z-index: 10;
+  }
+}
+
+/* Card moves in a diagonal pattern */
+@keyframes swapPosition6 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    z-index: 1;
+  }
+  50% {
+    transform: translate(calc(-100% - 1rem), calc(-100% - 1rem)) rotate(180deg) scale(1.1);
+    z-index: 10;
+  }
 }
 
 .card-inner {
@@ -115,10 +272,4 @@ h1 {
 
 .card:hover .card-inner {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-}
-
-@media (max-width: 640px) {
-  .card-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
