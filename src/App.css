@@ -21,6 +21,27 @@ footer {
   color: #888;
 }
 
+.mode-button {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.mode-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.mode-button:active {
+  transform: translateY(0);
+}
+
 .grid-size-selector {
   display: flex;
   gap: 0.5rem;
