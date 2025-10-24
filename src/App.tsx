@@ -162,7 +162,7 @@ function App() {
 
   const handleGridSizeChange = (option: GridOption) => {
     setGridOption(option)
-    setCards(createCards(option.rows * option.cols))
+    // Don't create cards here - let the useEffect handle it
     setFlippedCards([])
     setGoes(0)
     setMatchedPairs(0)
