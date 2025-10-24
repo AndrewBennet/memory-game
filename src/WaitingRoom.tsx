@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './WaitingRoom.css'
+import './WaitingRoom.scss'
 
 interface WaitingRoomProps {
   gameCode: string
@@ -30,7 +30,7 @@ function WaitingRoom({ gameCode, playerName, isHost, opponentName, onStartGame, 
         
         <div className="game-code-display">
           <label>Game Code:</label>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
+          <div className="game-code-container">
             <div className="game-code">{gameCode}</div>
             <button 
               className="copy-btn" 
@@ -45,7 +45,7 @@ function WaitingRoom({ gameCode, playerName, isHost, opponentName, onStartGame, 
 
         <div className="players-list">
           <div className="player-item">
-            <div className="player-avatar" style={{ background: '#667eea' }}>
+            <div className="player-avatar player-one">
               {playerName[0].toUpperCase()}
             </div>
             <div className="player-info">
@@ -57,7 +57,7 @@ function WaitingRoom({ gameCode, playerName, isHost, opponentName, onStartGame, 
           <div className="player-item">
             {opponentName ? (
               <>
-                <div className="player-avatar" style={{ background: '#f5576c' }}>
+                <div className="player-avatar player-two">
                   {opponentName[0].toUpperCase()}
                 </div>
                 <div className="player-info">

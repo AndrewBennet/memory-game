@@ -1,4 +1,4 @@
-import { ref, set, onValue, update, push } from 'firebase/database'
+import { ref, set, onValue, update, push, get } from 'firebase/database'
 import { database } from './firebase'
 import type { Card } from './types'
 
@@ -85,7 +85,7 @@ export const flipCard = async (gameId: string, cardId: number) => {
   const playerId = localStorage.getItem('playerId')!
   
   // Get current state to check flippedCards
-  const snapshot = await import('firebase/database').then(({ get }) => get(gameRef))
+  const snapshot = await get(gameRef)
   const currentState = snapshot.val() as GameState
   
   if (!currentState.flippedCards) {

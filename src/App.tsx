@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import './App.css'
+import './App.scss'
 import MultiplayerLobby from './MultiplayerLobby'
 import WaitingRoom from './WaitingRoom'
 import type { GameState } from './multiplayer'
@@ -102,9 +102,8 @@ function CardComponent({ card, onFlip, disabled }: CardProps) {
 
   return (
     <div 
-      className={`card ${card.isFlipped ? 'flipped' : ''} ${card.isMatched ? 'matched' : ''} ${card.type ? `card-${card.type}` : ''}`}
+      className={`card ${card.isFlipped ? 'flipped' : ''} ${card.isMatched ? 'matched' : ''} ${card.type ? `card-${card.type}` : ''} ${disabled || card.isMatched ? 'disabled' : ''}`}
       onClick={handleClick}
-      style={{ cursor: disabled || card.isMatched ? 'default' : 'pointer' }}
     >
       <div className="card-inner">
         <div className="card-front">
@@ -348,48 +347,22 @@ function App() {
       <div className="app">
         <img src="/icon.svg" alt="Logo" className="app-logo" />
         <h1>PromptMatch</h1>
-        <p style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>
+        <p className="subtitle">
           Match AI prompts with their generated images!
         </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '300px', margin: '0 auto' }}>
+        <div className="menu-buttons">
           <button 
-            className="mode-button"
+            className="mode-button single-player"
             onClick={() => setGameMode('single')}
-            style={{
-              padding: '1rem 2rem',
-              fontSize: '1.2rem',
-              fontWeight: '600',
-              border: 'none',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-              cursor: 'pointer',
-              transition: 'transform 0.2s',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
           >
             Single Player
           </button>
           <button 
-            className="mode-button"
+            className="mode-button multiplayer"
             onClick={() => {
               setGameMode('multiplayer')
               setMultiplayerState('lobby')
             }}
-            style={{
-              padding: '1rem 2rem',
-              fontSize: '1.2rem',
-              fontWeight: '600',
-              border: 'none',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-              color: 'white',
-              cursor: 'pointer',
-              transition: 'transform 0.2s',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
           >
             Multiplayer
           </button>
@@ -449,42 +422,20 @@ function App() {
       <img src="/icon.svg" alt="Logo" className="app-logo" />
       <h1>PromptMatch</h1>
       {gameMode === 'multiplayer' && (
-        <div style={{ marginBottom: '1rem' }}>
-          <button
-            onClick={handleLeaveRoom}
-            style={{
-              padding: '0.5rem 1rem',
-              fontSize: '0.9rem',
-              border: '2px solid #f5576c',
-              borderRadius: '8px',
-              background: 'transparent',
-              color: '#f5576c',
-              cursor: 'pointer',
-              fontWeight: '600',
-            }}
-          >
-            ← Back to Menu
-          </button>
-        </div>
+        <button
+          onClick={handleLeaveRoom}
+          className="back-button back-from-multiplayer"
+        >
+          ← Back to Menu
+        </button>
       )}
       {gameMode === 'single' && (
-        <div style={{ marginBottom: '1rem' }}>
-          <button
-            onClick={() => setGameMode('menu')}
-            style={{
-              padding: '0.5rem 1rem',
-              fontSize: '0.9rem',
-              border: '2px solid #667eea',
-              borderRadius: '8px',
-              background: 'transparent',
-              color: '#667eea',
-              cursor: 'pointer',
-              fontWeight: '600',
-            }}
-          >
-            ← Back to Menu
-          </button>
-        </div>
+        <button
+          onClick={() => setGameMode('menu')}
+          className="back-button back-to-menu"
+        >
+          ← Back to Menu
+        </button>
       )}
       {gameMode === 'single' && (
         <div className="grid-size-selector">
@@ -501,51 +452,39 @@ function App() {
       )}
       
       {gameMode === 'multiplayer' && gameState && (
-        <div className="multiplayer-info" style={{ marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', marginBottom: '1rem' }}>
+        <div className="multiplayer-info">
+          <div className="players-container">
             {Object.entries(gameState.players).map(([playerId, player]) => {
               const isCurrentPlayer = playerId === localStorage.getItem('playerId')
               const isTheirTurn = gameState.currentTurn === playerId
               return (
                 <div
                   key={playerId}
+                  className={`player-card ${isTheirTurn ? 'active' : ''}`}
                   style={{
-                    padding: '1rem',
-                    borderRadius: '12px',
-                    background: isTheirTurn ? `linear-gradient(135deg, ${player.color}40, ${player.color}20)` : 'rgba(255,255,255,0.05)',
-                    border: `2px solid ${isTheirTurn ? player.color : 'transparent'}`,
-                    minWidth: '120px',
-                    transition: 'all 0.3s',
+                    background: isTheirTurn ? `linear-gradient(135deg, ${player.color}40, ${player.color}20)` : undefined,
+                    borderColor: isTheirTurn ? player.color : undefined,
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <div className="player-header">
                     <div
-                      style={{
-                        width: '30px',
-                        height: '30px',
-                        borderRadius: '50%',
-                        background: player.color,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 'bold',
-                        fontSize: '1rem',
-                      }}
+                      className="player-avatar-small"
+                      style={{ background: player.color }}
                     >
                       {player.name[0].toUpperCase()}
                     </div>
                     <div>
-                      <div style={{ fontWeight: '600' }}>
+                      <div className="player-name-label">
                         {player.name} {isCurrentPlayer && '(You)'}
                       </div>
                       {isTheirTurn && (
-                        <div style={{ fontSize: '0.8rem', color: player.color, fontWeight: '600' }}>
+                        <div className="turn-indicator" style={{ color: player.color }}>
                           ▶ Your turn!
                         </div>
                       )}
                     </div>
                   </div>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>
+                  <div className="player-score">
                     {player.score} matches
                   </div>
                 </div>
@@ -553,7 +492,7 @@ function App() {
             })}
           </div>
           {gameState.winner && (
-            <div className="win-message" style={{ marginTop: '1rem' }}>
+            <div className="win-message">
               {gameState.winner === 'tie' 
                 ? "🎉 It's a tie! 🎉"
                 : `🎉 ${gameState.players[gameState.winner]?.name} wins! 🎉`

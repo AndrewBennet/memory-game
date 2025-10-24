@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './MultiplayerLobby.css'
+import './MultiplayerLobby.scss'
 
 interface MultiplayerLobbyProps {
   onCreateGame: (playerName: string) => void
