@@ -8,17 +8,75 @@
   padding: 2rem;
   text-align: center;
   box-sizing: border-box;
+  background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 50%, #1e1e2e 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.app::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(245, 87, 108, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  animation: backgroundPulse 8s ease-in-out infinite;
+}
+
+@keyframes backgroundPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
 }
 
 h1 {
   margin-bottom: 1.5rem;
-  font-size: 2.5rem;
+  font-size: 3rem;
+  background: linear-gradient(135deg, #667eea 0%, #f093fb 50%, #f5576c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+  letter-spacing: -1px;
+  text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+  position: relative;
+  z-index: 1;
+  animation: titleGlow 3s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(245, 87, 108, 0.5));
+  }
+}
+
+.app-logo {
+  filter: drop-shadow(0 0 15px rgba(102, 126, 234, 0.6));
+  animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(5deg);
+  }
 }
 
 footer {
   margin-top: 2rem;
   font-size: 0.9rem;
-  color: #888;
+  color: #a8a8b8;
+  position: relative;
+  z-index: 1;
 }
 
 .mode-button {
@@ -26,20 +84,38 @@ footer {
   font-size: 1.2rem;
   font-weight: 600;
   border: none;
-  border-radius: 12px;
+  border-radius: 16px;
   color: white;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.mode-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.mode-button:hover::before {
+  left: 100%;
 }
 
 .mode-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .mode-button:active {
-  transform: translateY(0);
+  transform: translateY(-2px) scale(0.98);
 }
 
 .grid-size-selector {
@@ -53,30 +129,52 @@ footer {
 .size-button {
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
-  background-color: #1a1a1a;
-  color: white;
-  border: 2px solid transparent;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 2px solid rgba(102, 126, 234, 0.4);
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s;
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 1;
+  font-weight: 500;
 }
 
 .size-button:hover {
-  border-color: #646cff;
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  color: #ffffff;
 }
 
 .size-button.active {
-  background-color: #646cff;
-  border-color: #646cff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.5);
+  font-weight: 700;
+  color: #ffffff;
 }
 
 .game-info {
   margin-bottom: 1rem;
   font-size: 1.2rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem 2rem;
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
+  color: #ffffff;
 }
 
 .game-info p {
   margin: 0.5rem 0;
+  font-weight: 600;
+  color: #ffffff;
 }
 
 .stats-row {
@@ -93,7 +191,8 @@ footer {
 .matched-number {
   display: inline-block;
   font-weight: bold;
-  color: #4ade80;
+  color: #6ee7b7;
+  text-shadow: 0 0 10px rgba(110, 231, 183, 0.5);
   animation: matchPop 0.5s ease-out;
 }
 
@@ -111,36 +210,76 @@ footer {
 }
 
 .win-message {
-  color: #4ade80;
-  font-weight: bold;
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 900;
   font-size: 1.5rem;
-  animation: celebration 0.5s ease-in-out;
+  animation: celebration 0.5s ease-in-out, winGlow 2s ease-in-out infinite;
+  text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
+  filter: drop-shadow(0 0 10px rgba(74, 222, 128, 0.5));
 }
 
 @keyframes celebration {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(-2deg); }
+  75% { transform: scale(1.1) rotate(2deg); }
+}
+
+@keyframes winGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(74, 222, 128, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(74, 222, 128, 0.8));
+  }
 }
 
 .reset-button {
   margin-bottom: 2rem;
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
-  background-color: #646cff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.reset-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.reset-button:hover:not(:disabled)::before {
+  width: 300px;
+  height: 300px;
 }
 
 .reset-button:hover:not(:disabled) {
-  background-color: #535bf2;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(102, 126, 234, 0.6);
 }
 
 .reset-button:disabled {
-  opacity: 0.6;
+  opacity: 0.4;
   cursor: not-allowed;
+  transform: none;
 }
 
 .card-grid {
