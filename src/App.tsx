@@ -250,7 +250,12 @@ function App() {
         ))}
       </div>
       <div className="game-info">
-        <p>Goes: {goes}</p>
+        <div className="stats-row">
+          <p>Goes: {goes}</p>
+          <p className="matched-count">
+            Matched: <span className="matched-number" key={matchedPairs}>{matchedPairs}</span> / {totalPairs}
+          </p>
+        </div>
         {isGameComplete && (
           <p className="win-message">
             🎉 You won in {goes} {goes === 1 ? 'go' : 'goes'}! 🎉
