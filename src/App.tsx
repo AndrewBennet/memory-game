@@ -63,7 +63,8 @@ function App() {
   const [numCards] = useState(16)
   const [cards, setCards] = useState<Card[]>([])
   const [flippedCards, setFlippedCards] = useState<number[]>([])
-  const [score, setScore] = useState(0)
+  const [goes, setGoes] = useState(0)
+  const [matchedPairs, setMatchedPairs] = useState(0)
   const [isChecking, setIsChecking] = useState(false)
 
   useEffect(() => {
@@ -73,6 +74,7 @@ function App() {
   useEffect(() => {
     if (flippedCards.length === 2) {
       setIsChecking(true)
+      setGoes(prev => prev + 1) // Increment goes when two cards are flipped
       const [firstId, secondId] = flippedCards
       const firstCard = cards.find(card => card.id === firstId)
       const secondCard = cards.find(card => card.id === secondId)
@@ -85,7 +87,7 @@ function App() {
               ? { ...card, isMatched: true }
               : card
           ))
-          setScore(score + 1)
+          setMatchedPairs(prev => prev + 1)
           setFlippedCards([])
           setIsChecking(false)
         }, 600)
@@ -102,7 +104,7 @@ function App() {
         }, 1000)
       }
     }
-  }, [flippedCards, cards, score])
+  }, [flippedCards, cards])
 
   const handleFlip = (id: number) => {
     if (flippedCards.length < 2 && !flippedCards.includes(id)) {
@@ -116,19 +118,24 @@ function App() {
   const handleReset = () => {
     setCards(createCards(numCards))
     setFlippedCards([])
-    setScore(0)
+    setGoes(0)
+    setMatchedPairs(0)
     setIsChecking(false)
   }
 
   const totalPairs = numCards / 2
-  const isGameComplete = score === totalPairs
+  const isGameComplete = matchedPairs === totalPairs
 
   return (
     <div className="app">
       <h1>Memory Card Game</h1>
       <div className="game-info">
-        <p>Score: {score} / {totalPairs}</p>
-        {isGameComplete && <p className="win-message">🎉 You won! 🎉</p>}
+        <p>Goes: {goes}</p>
+        {isGameComplete && (
+          <p className="win-message">
+            🎉 You won in {goes} {goes === 1 ? 'go' : 'goes'}! 🎉
+          </p>
+        )}
       </div>
       <button className="reset-button" onClick={handleReset}>
         Reset Game
